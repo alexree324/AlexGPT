@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3b82f6" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon-192.png" />
+  <title>AlexGPT</title>
+  <style>
+    :root{
+      --bg:#0b0f17;
+      --card:#121a2a;
+      --line:#22304d;
+      --ink:#e8eefc;
+      --muted:#b9c7ea;
+      --muted2:#93a7d8;
+      --blue:#3b82f6;
+      --blue2:#93c5fd;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: radial-gradient(1200px 900px at 50% -10%, rgba(59,130,246,.25), transparent 55%),
+                  radial-gradient(900px 700px at 20% 110%, rgba(147,197,253,.18), transparent 55%),
+                  var(--bg);
+      color:var(--ink);
+      padding: 18px;
+      padding-top: calc(18px + env(safe-area-inset-top));
+      padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    }
+    .wrap{max-width:920px;margin:0 auto}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:14px 14px 10px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(18,26,42,.85);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 14px 45px rgba(0,0,0,.35);
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;min-width:0;
+    }
+    .orb{
+      width:42px;height:42px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, var(--blue2), var(--blue) 55%, rgba(59,130,246,.35) 100%);
+      box-shadow: 0 0 0 6px rgba(59,130,246,.12), 0 18px 40px rgba(59,130,246,.18);
+      position:relative;
+    }
+    .orb:after{
+      content:"";
+      position:absolute;inset:8px;
+      border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 55%);
+      opacity:.6;
+    }
+    h1{margin:0;font-size:18px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sub{margin:0;color:var(--muted2);font-size:12px}
+    .chip{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--line);
+      padding:8px 10px;border-radius:999px;
+      background: rgba(15,22,38,.75);
+      white-space:nowrap;
+    }
+    .card{
+      margin-top:14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(18,26,42,.85);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 14px 45px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .pad{padding:16px}
+    .primary{
+      width:100%;
+      border:0;
+      border-radius:18px;
+      padding:18px 16px;
+      font-size:18px;
+      font-weight:900;
+      background: linear-gradient(180deg, rgba(147,197,253,.28), rgba(59,130,246,.0)),
+                  var(--blue);
+      color:white;
+      cursor:pointer;
+      box-shadow: 0 16px 40px rgba(59,130,246,.24);
+      transition: transform .08s ease;
+    }
+    .primary:active{transform: translateY(1px) scale(.99)}
+    .row{display:flex;gap:10px;margin-top:10px}
+    .row button{
+      flex:1;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 10px;
+      background: rgba(15,22,38,.8);
+      color:var(--ink);
+      font-weight:800;
+      cursor:pointer;
+    }
+    .out{
+      margin-top:12px;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px dashed rgba(147,167,216,.35);
+      background: rgba(15,22,38,.75);
+      min-height:56px;
+      display:flex;align-items:center;
+      line-height:1.25;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    label{display:block;font-size:12px;color:var(--muted2);margin-bottom:6px}
+    select,input[type="range"],textarea{
+      width:100%;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(15,22,38,.8);
+      color:var(--ink);
+      padding:10px;
+    }
+    textarea{min-height:170px;resize:vertical}
+    .tiny{font-size:12px;color:var(--muted2);margin-top:8px;line-height:1.35}
+    .hr{height:1px;background:rgba(34,48,77,.8);margin:12px 0}
+    .footer{
+      margin-top:10px;
+      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      color:var(--muted2);font-size:12px;
+    }
+    .a{
+      color:var(--blue2);
+      text-decoration: none;
+      font-weight:800;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="orb" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <h1>AlexGPT</h1>
+          <p class="sub">Tap → random phrase → speak</p>
+        </div>
+      </div>
+      <div class="chip" id="installHint">Tip: Use “Install app” in Chrome</div>
+    </div>
+
+    <div class="card">
+      <div class="pad">
+        <button class="primary" id="speakBtn">🎲 Speak Random Phrase</button>
+
+        <div class="row">
+          <button id="testBtn" type="button">🔊 Test</button>
+          <button id="stopBtn" type="button">⛔ Stop</button>
+        </div>
+
+        <div class="out" id="lastOut">—</div>
+
+        <div class="hr"></div>
+
+        <div class="grid">
+          <div>
+            <label for="voiceSelect">Voice</label>
+            <select id="voiceSelect"></select>
+          </div>
+          <div>
+            <label for="rateRange">Rate</label>
+            <input id="rateRange" type="range" min="0.6" max="1.4" step="0.05" value="1">
+            <div class="tiny">Rate: <span id="rateVal">1.00</span></div>
+          </div>
+          <div>
+            <label for="pitchRange">Pitch</label>
+            <input id="pitchRange" type="range" min="0.6" max="1.4" step="0.05" value="1">
+            <div class="tiny">Pitch: <span id="pitchVal">1.00</span></div>
+          </div>
+          <div>
+            <label for="volRange">Volume</label>
+            <input id="volRange" type="range" min="0" max="1" step="0.05" value="1">
+            <div class="tiny">Volume: <span id="volVal">1.00</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <label for="phrasesBox">Phrases (one per line)</label>
+          <textarea id="phrasesBox"></textarea>
+          <div class="tiny">You can edit this list anytime. Blank lines are ignored.</div>
+        </div>
+
+        <div class="footer">
+          <div>Works offline once installed.</div>
+          <div><a class="a" href="#" id="showInstall">How to install</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Your phrase list (no explicit content included)
+  const defaultPhrases = [
+    "Oh me lord, not right when I load into the match.",
+    "Hold up—El Cinco better not freeze on me right now.",
+    "Nahhh, my power cannot be flickering during ranked.",
+    "Bro, if the Wi-Fi drops again I’m moving to the woods.",
+    "Oh me lord, that lag spike just humbled me.",
+    "Tell me why my ping lookin’ like a phone number.",
+    "El Cinco, don’t embarrass me in front of the squad.",
+    "My power just blinked… don’t play with me like that.",
+    "Why Duolingo got better connection than my router?",
+    "Oh me lord, I pressed jump, not lay down.",
+    "If the Wi-Fi cuts out, I’m blaming the squirrels.",
+    "El Cinco, you were raised better than this.",
+    "Nah, because why is the storm outside acting personal?",
+    "Oh me lord, that was supposed to be my kill.",
+    "My power bill better not be high if it’s acting like this.",
+    "I just reset the router and it’s already tired.",
+    "El Cinco sounding like it’s about to take flight.",
+    "Oh me lord, I swear I hit that shot.",
+    "The Wi-Fi said “adiós” mid-game.",
+    "Why the lights dimming like it’s dramatic?",
+    "Oh me lord, I just got folded.",
+    "If my power goes out one more time, I’m learning survival skills.",
+    "El Cinco, don’t crash on me now, partner.",
+    "The lag got me fighting ghosts.",
+    "Oh me lord, that was disrespectful.",
+    "Tell me why my internet only struggles when I’m winning.",
+    "My router blinking like it’s Morse code.",
+    "El Cinco trying to sound like a tractor.",
+    "Oh me lord, that flick was clean though.",
+    "Why Duolingo never buffers but my game does?",
+    "If the Wi-Fi drops, I’m switching to Spanish out of spite.",
+    "Oh me lord, not the update screen.",
+    "El Cinco said “resting mode” without asking me.",
+    "The power outside sounding windy for no reason.",
+    "Oh me lord, I almost clutched that.",
+    "My internet got stage fright.",
+    "Why the thunder sound like it unplugged me itself?",
+    "El Cinco better not overheat like last summer.",
+    "Oh me lord, I lagged into next week.",
+    "My Wi-Fi acting rural right now.",
+    "Oh me lord, I just got third-partied.",
+    "The lights flickered and I froze before the console did.",
+    "El Cinco, you and me—we stronger than this.",
+    "Why the router blinking red like it’s mad?",
+    "Oh me lord, I can’t lose because of weather.",
+    "If my power goes out, I’m writing a complaint to the clouds.",
+    "The Wi-Fi said “hasta luego” mid-match.",
+    "El Cinco, hold steady, soldier.",
+    "Oh me lord, that aim assist betrayed me.",
+    "My internet be smooth all day until 7 PM.",
+    "Oh me lord, I pressed reload!",
+    "The storm outside doing too much.",
+    "El Cinco better not start humming loud again.",
+    "My Wi-Fi buffering like it’s thinking about life.",
+    "Oh me lord, that was my moment.",
+    "If the power cuts, I’m lighting candles like it’s 1800.",
+    "The router lights blinking like Christmas.",
+    "El Cinco said “update required” at the worst time.",
+    "Oh me lord, why is my ping spiking?",
+    "My internet acting suburban country right now.",
+    "Oh me lord, I can’t believe that worked.",
+    "The lights dimmed and I gasped louder than the game.",
+    "El Cinco, don’t do me like this.",
+    "The Wi-Fi acting shy.",
+    "Oh me lord, that combo was nasty.",
+    "If the storm knocks my power out, I’m fighting the wind.",
+    "The router needs a pep talk.",
+    "El Cinco, we been through worse.",
+    "Oh me lord, that lag teleport was wild.",
+    "My internet really said “not today.”",
+    "Oh me lord, that jump scared me.",
+    "The thunder clapped and so did I.",
+    "El Cinco better keep breathing.",
+    "My Wi-Fi fighting for its life.",
+    "Oh me lord, that was almost a clip.",
+    "If the power flickers again, I’m unplugging everything first.",
+    "The router looking confused.",
+    "El Cinco standing ten toes down.",
+    "Oh me lord, that was disrespectful aim.",
+    "My Wi-Fi moving like it’s on country time.",
+    "Oh me lord, I lagged right into that.",
+    "The lights blinked and I held my breath.",
+    "El Cinco, don’t give up on me now.",
+    "My Wi-Fi need to lock in.",
+    "Oh me lord, that was clean though.",
+    "If the power goes out, I’m blaming the weather app.",
+    "The router better chill.",
+    "El Cinco carrying the whole house right now.",
+    "Oh me lord, I can’t believe that just happened.",
+    "My Wi-Fi acting like it’s got somewhere else to be."
+  ];
+
+  const phrasesBox = document.getElementById("phrasesBox");
+  const lastOut = document.getElementById("lastOut");
+  const voiceSelect = document.getElementById("voiceSelect");
+  const rateRange = document.getElementById("rateRange");
+  const pitchRange = document.getElementById("pitchRange");
+  const volRange = document.getElementById("volRange");
+  const rateVal = document.getElementById("rateVal");
+  const pitchVal = document.getElementById("pitchVal");
+  const volVal = document.getElementById("volVal");
+
+  // Persist user edits & settings
+  const LS_KEYS = {
+    phrases: "alexgpt_phrases_v1",
+    voice: "alexgpt_voice_v1",
+    rate: "alexgpt_rate_v1",
+    pitch:"alexgpt_pitch_v1",
+    vol:  "alexgpt_vol_v1"
+  };
+
+  function loadPhrases() {
+    const saved = localStorage.getItem(LS_KEYS.phrases);
+    phrasesBox.value = saved ? saved : defaultPhrases.join("\n");
+  }
+  function savePhrases() {
+    localStorage.setItem(LS_KEYS.phrases, phrasesBox.value);
+  }
+  phrasesBox.addEventListener("input", () => {
+    // debounce-ish
+    clearTimeout(window.__saveT);
+    window.__saveT = setTimeout(savePhrases, 200);
+  });
+
+  function getPhrases() {
+    return phrasesBox.value.split("\n").map(s => s.trim()).filter(Boolean);
+  }
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function syncLabels() {
+    rateVal.textContent = Number(rateRange.value).toFixed(2);
+    pitchVal.textContent = Number(pitchRange.value).toFixed(2);
+    volVal.textContent = Number(volRange.value).toFixed(2);
+    localStorage.setItem(LS_KEYS.rate, rateRange.value);
+    localStorage.setItem(LS_KEYS.pitch, pitchRange.value);
+    localStorage.setItem(LS_KEYS.vol, volRange.value);
+  }
+  [rateRange, pitchRange, volRange].forEach(el => el.addEventListener("input", syncLabels));
+
+  function populateVoices() {
+    const voices = window.speechSynthesis.getVoices() || [];
+    const savedVoice = localStorage.getItem(LS_KEYS.voice) ?? "";
+    voiceSelect.innerHTML = "";
+
+    const auto = document.createElement("option");
+    auto.value = "";
+    auto.textContent = "Auto (system default)";
+    voiceSelect.appendChild(auto);
+
+    voices.forEach((v, idx) => {
+      const opt = document.createElement("option");
+      opt.value = String(idx);
+      opt.textContent = `${v.name} — ${v.lang}${v.default ? " (default)" : ""}`;
+      voiceSelect.appendChild(opt);
+    });
+
+    voiceSelect.value = savedVoice;
+  }
+
+  voiceSelect.addEventListener("change", () => {
+    localStorage.setItem(LS_KEYS.voice, voiceSelect.value);
+  });
+
+  function applySavedControls() {
+    const r = localStorage.getItem(LS_KEYS.rate);
+    const p = localStorage.getItem(LS_KEYS.pitch);
+    const v = localStorage.getItem(LS_KEYS.vol);
+    if (r) rateRange.value = r;
+    if (p) pitchRange.value = p;
+    if (v) volRange.value = v;
+    syncLabels();
+  }
+
+  function speak(text) {
+    window.speechSynthesis.cancel();
+
+    const utter = new SpeechSynthesisUtterance(text);
+
+    const voices = window.speechSynthesis.getVoices() || [];
+    const chosenIdx = voiceSelect.value ? parseInt(voiceSelect.value, 10) : NaN;
+    if (!Number.isNaN(chosenIdx) && voices[chosenIdx]) {
+      utter.voice = voices[chosenIdx];
+    }
+
+    utter.rate = parseFloat(rateRange.value);
+    utter.pitch = parseFloat(pitchRange.value);
+    utter.volume = parseFloat(volRange.value);
+
+    window.speechSynthesis.speak(utter);
+  }
+
+  document.getElementById("speakBtn").addEventListener("click", () => {
+    const list = getPhrases();
+    if (!list.length) {
+      lastOut.textContent = "Add at least one phrase first.";
+      return;
+    }
+    const chosen = pickRandom(list);
+    lastOut.textContent = chosen;
+    speak(chosen);
+  });
+
+  document.getElementById("testBtn").addEventListener("click", () => {
+    speak("AlexGPT online.");
+    setTimeout(populateVoices, 200);
+  });
+
+  document.getElementById("stopBtn").addEventListener("click", () => {
+    window.speechSynthesis.cancel();
+  });
+
+  // Install help
+  document.getElementById("showInstall").addEventListener("click", (e) => {
+    e.preventDefault();
+    alert("To install: open this page in Chrome → tap ⋮ → Install app (or Add to Home screen).\n\nNote: PWA install works best when the app is hosted (https). If you opened it from a local file, you may only see 'Add to Home screen'.");
+  });
+
+  // Service worker (needs https or localhost)
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+
+  // Boot
+  loadPhrases();
+  applySavedControls();
+  populateVoices();
+  window.speechSynthesis.onvoiceschanged = () => populateVoices();
+</script>
+</body>
+</html>
